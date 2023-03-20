@@ -2,75 +2,80 @@
 import numpy as np
 import cv2
 
-def check(x,y):
-    return ( x >=0 and x < rows) and (y >=0 and y < cols)
+class myMatrix:
+    def __init__(self,image_matrix):
+        # Random image matrix
+        # image_matrix = np.random.randint(10, size=(5, 4))
+        self.image_matrix = image_matrix
+        # laplacian Filter matrix
+        self.mask = np.array([[0, 1, 0], [1, -4, 1], [0, 1, 0]])
+        # get rows and columns
+        (self.rows, self.cols) = (len(self.image_matrix), (len(self.image_matrix[0])))
+        # print(rows,colums)
+        # create new image matrix
+        self.new_image_matrix = np.arange(self.rows * self.cols).reshape(self.rows, self.cols)
+        self.maxPixel = -9223372036854775807
+        self.minPixel = 9223372036854775807
 
-def laplaceFilterHelper(x,y):
-    new_value = 0
-    for i in range(-1,2):
-        for j in range(-1,2):
-            if(check(x+i,y+j)):
-                new_value += filter[1+i][1+j] * image_matrix[x+i][y+j]
-                # print("(%d\t%d)" %(i,j), end="\t")
-        # print()
-    return new_value
+    # methods
+    def check(self,x,y):
+        return ( x >=0 and x < self.rows) and (y >= 0 and y < self.cols)
 
-def printArray(array):
-    print(np.matrix(array))
+    def laplaceFilterHelper(self,x,y):
+        new_value = 0
+        for i in range(-1,2):
+            for j in range(-1,2):
+                if(self.check(x+i,y+j)):
+                    new_value += self.mask[1+i][1+j] * self.image_matrix[x + i][y + j]
+                    # print("(%d\t%d)" %(i,j), end="\t")
+            # print()
+        return new_value
 
-
-def Normalize(pixel):
-    return int(255*(pixel - minPixel)/(maxPixel - minPixel))
-
-
-
-def LaplacianFilter(image):
-    for i in range(rows):
-        for j in range(cols):
-            image[i][j] = laplaceFilterHelper(i, j)
-            # print(image_matrix[i][j], end=" ")
-        #     print(new_image_matrix[i][j], end="\t")
-        # print()
-
-
-#####################  MAIN #################################
-
-
-img = cv2.imread("img2.jpg")
+    def printArray(self,array):
+        print(np.matrix(array))
 
 
+    def Normalize(self,pixel):
+        # minPixel = self.new_image_matrix.min()
+        # maxPixel = self.new_image_matrix.max()
+        return int(255*(pixel - self.minPixel)/(self.maxPixel - self.minPixel))
 
 
 
-# laplacian Filter matrix
-filter = np.array([[0,1,0],[1,-4,1],[0,1,0]])
+    def LaplacianFilter(self,image):
+        for i in range(self.rows):
+            for j in range(self.cols):
+                image[i][j] = self.laplaceFilterHelper(i, j)
+                if(image[i][j] < self.minPixel): self.minPixel = image[i][j]
+                if (image[i][j] > self.maxPixel): self.maxPixel = image[i][j]
+                # print(image_matrix[i][j], end=" ")
+            #     print(new_image_matrix[i][j], end="\t")
+            # print()
 
-# Random image matrix
-image_matrix = np.random.randint(10,size=(5,4))
+    def Filter(self):
+        ################# MAIN ####################
+        print("Random Image Matrix:")
+        self.printArray(self.image_matrix)
 
-# get rows and columns
-(rows,cols) = (len(image_matrix),(len(image_matrix[0])))
-# print(rows,colums)
+        print("\nMask:")
+        self.printArray(self.mask)
 
-# create new image matrix
-new_image_matrix = np.arange(rows*cols).reshape(rows,cols)
+        # Applying Laplacian Filter and Normalize
+        print("\nResult Matrix:")
+        self.LaplacianFilter(self.new_image_matrix)
 
-print("Random Image Matrix:")
-printArray(image_matrix)
+        self.printArray(self.new_image_matrix)
 
-print("\nMask:")
-printArray(filter)
+        print("\nNormalize Matrix:")
+        normalize_matrix = np.vectorize(self.Normalize)(self.new_image_matrix)
+        self.printArray(normalize_matrix)
+        return normalize_matrix
+    # end methods
 
-# Applying Laplacian Filter and Normalize
-print("\nResult Matrix:")
-LaplacianFilter(new_image_matrix)
 
-minPixel = new_image_matrix.min()
-maxPixel = new_image_matrix.max()
+######### MAIN ########
 
-printArray(new_image_matrix)
 
-print("\nNormalize Matrix:")
-normalize_matrix = np.vectorize(Normalize)(new_image_matrix)
-printArray(normalize_matrix)
+# m = myMatrix(np.random.randint(10, size=(5, 4)))
+# m.Filter()
 
