@@ -13,7 +13,7 @@ class myMatrix:
         (self.rows, self.cols) = (len(self.image_matrix), (len(self.image_matrix[0])))
         # print(rows,colums)
         # create new image matrix
-        self.new_image_matrix = np.arange(self.rows * self.cols).reshape(self.rows, self.cols)
+        self.new_image_matrix = np.copy(image_matrix)
         self.maxPixel = -9223372036854775807
         self.minPixel = 9223372036854775807
 
@@ -36,15 +36,18 @@ class myMatrix:
 
 
     def Normalize(self,pixel):
-        # minPixel = self.new_image_matrix.min()
-        # maxPixel = self.new_image_matrix.max()
-        return int(255*(pixel - self.minPixel)/(self.maxPixel - self.minPixel))
+        if pixel < 0:
+            pixel = 0
+        elif pixel > 255:
+            pixel = 255
+        return pixel
+        # return int(255*(pixel - self.minPixel)/(self.maxPixel - self.minPixel))
 
 
 
     def LaplacianFilter(self,image):
-        for i in range(self.rows):
-            for j in range(self.cols):
+        for i in range(1,self.rows-1):
+            for j in range(1,self.cols-1):
                 image[i][j] = self.laplaceFilterHelper(i, j)
                 if(image[i][j] < self.minPixel): self.minPixel = image[i][j]
                 if (image[i][j] > self.maxPixel): self.maxPixel = image[i][j]
