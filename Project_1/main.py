@@ -2,6 +2,7 @@
 import cv2
 from LaplaceFilter import *
 import numpy as np
+from google.colab.patches import cv2_imshow
 
 # [3,2,1] [11,00000010,00000001] -> 110000001000000001 -> 197121
 def rgbtoint32(rgb):
@@ -36,9 +37,10 @@ m = myMatrix(pixelMatrix)
 pixelMatrixFiltered = m.Filter()
 
 gen = np.array(pixelMatrixFiltered ,dtype=np.uint8)
-cv2.imshow('output',gen)
-cv2.waitKey(0)
-cv2.destroyWindow('i')
+# cv2.imshow('output',gen)
+cv2_imshow(gen)
+# cv2.waitKey(0)
+# cv2.destroyWindow('i')
 
 
 
